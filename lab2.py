@@ -7,8 +7,10 @@ def extractWebpage(websiteLink):
         'User-Agent' : 'Mozilla'
     }
     outputData = requests.get(websiteLink,headers = header)
-
-    return outputData.text
+    if outputData.status_code == 200:
+        return outputData.text
+    else:
+        return ""
 
 def webPageData(webpage):
 
@@ -96,19 +98,29 @@ def common_bits(f1, f2):
         bitChange >>= 1
     return 64 - count
 
+if len(sys.argv) < 3:
+    print("Usage: python lab2.py <URL1> <URL2>")
+else:
+    url1 = sys.argv[1]
+    url2 = sys.argv[2]
 
-url1 = sys.argv[1]
-url2 = sys.argv[2]
+    html1 = extractWebpage(url1)
+    if html1:
+        title1, body1, links1 = webPageData(html1)
+        freq1 = wordFrequency(body1)
+        h1 = compute_simhash(freq1)
+    else:
+        print("Error fetching first URL")
+        h1 = 0
 
-html1 = extractWebpage(url1)
-title1, body1, links1 = webPageData(html1)
-freq1 = wordFrequency(body1)
-h1 = compute_simhash(freq1)
+    html2 = extractWebpage(url2)
+    if html2:
+        title2, body2, links2 = webPageData(html2)
+        freq2 = wordFrequency(body2)
+        h2 = compute_simhash(freq2)
+    else:
+        print("Error fetching second URL")
+        h2 = 0
 
-html2 = extractWebpage(url2)
-title2, body2, links2 = webPageData(html2)
-freq2 = wordFrequency(body2)
-h2 = compute_simhash(freq2)
-
-result = common_bits(h1, h2)
-print(result)
+    result = common_bits(h1, h2)
+    print(result)
